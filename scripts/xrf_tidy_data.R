@@ -36,7 +36,7 @@ all_id_select <- all_id %>%
   view  
 
 
-##### Changing the number format in column "Reading_No" to "000" and rename it as reading_id  
+##### Adding a new column "reading_id" with the number format "000" and concatenating with date
 all_id_select %>% mutate(reading_id = str_pad(Reading_No, 3, "left", "0")) %>% 
   unite(reading_id, Date, reading_id, sep = "-") %>% 
   group_by(Trunc)
