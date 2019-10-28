@@ -31,7 +31,7 @@ str(all_id)
 
 ##### Select only where Remarks is equal to "NA" and GENPRINT not equal to "NA" #####
 all_id_select <- all_id %>% 
-  select(Trunc, SUBSAMPLE_ID, STEM_ID, GENPRINT, Date, Reading_No, Mode, Remarks) %>% 
+  select(Trunc, SUBSAMPLE_ID, STEM_ID, SUBSAMPLE, GENPRINT, Date, Reading_No, Mode, Remarks) %>% 
   filter(is.na(Remarks), !is.na(GENPRINT)) %>% 
   view  
 
@@ -39,12 +39,21 @@ all_id_select <- all_id %>%
 ##### Adding a new column "reading_id" with the number format "000" and concatenating with date
 all_id_select %>% mutate(reading_id = str_pad(Reading_No, 3, "left", "0")) %>% 
   unite(reading_id, Date, reading_id, sep = "-") %>% 
-  select(reading_id, SUBSAMPLE_ID, STEM_ID, GENPRINT) %>% 
+  select(reading_id, SUBSAMPLE_ID, STEM_ID, GENPRINT, SUBSAMPLE) %>% 
   write_csv("data/clean_data/all_pxrf_id.csv")
+
+#-----------------------------------------------------------------------------------------------#
+## temp <- data.table::fread("data/pXRF_Data_original/chemistry-803819-2019-08-22-16-49-44.csv")
+
+## temp%>%
+##  rename(Reading_No = `Reading #`)
+#-----------------------------------------------------------------------------------------------#
 
 
 ##### Reading each file with pXRF chemistry data #####
 chem_xrf_22aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-16-49-44.csv")
+
+chem_xrf_222aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-12-33-41.csv")
 
 chem_xrf_23aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-23-12-46-47.csv")
 
