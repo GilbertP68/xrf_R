@@ -46,8 +46,9 @@ all_id %>%
 
   write_csv(all_id_select, "data/clean_data/all_pxrf_id.csv")
   
-  
-##### Another way of creating new column heading: Adding a new column "reading_id" with the number format "000" and concatenating with date
+#####################################################################################################  
+# Another way of creating new column heading: Adding a new column "reading_id" with the number
+# format "000" and concatenating with date
 # all_id_select %>% mutate(SCANNING_CODE = str_pad(Reading_No, 3, "left", "0")) %>% 
 # unite(reading_id, Date, reading_id, sep = "-") %>% 
 #  select(reading_id, SUBSAMPLE_ID, STEM_ID, GENPRINT, SUBSAMPLE) %>% 
@@ -56,11 +57,12 @@ all_id %>%
 #-----------------------------------------------------------------------------------------------#
 ## temp <- data.table::fread("data/pXRF_Data_original/chemistry-803819-2019-08-22-16-49-44.csv")
 
-## temp%>%
+## temp %>%
 ##  rename(Reading_No = `Reading #`)
 #-----------------------------------------------------------------------------------------------#
-
-
+#####################################################################################################
+  
+  
 ##### Reading each file with pXRF chemistry data #####
 
 xrf_files <- list.files(path = "data/pXRF_Data_original/", pattern = "chemistry", full.names = T)
@@ -78,8 +80,6 @@ names(xrf_raw)
 rm(xrf_files, xrf_list)
 
 
-# Mung
-
 nrow(distinct(xrf_raw, `Reading #`, Date)) #looks like there are duplicate records in different
 # excel files; we can ensure they are true duplicates, rather than label duplications, 
 # by using distinct() on the date frame once the .id is dropped.
@@ -96,9 +96,11 @@ xrf_raw%>%
   xrf_data
 view(xrf_data)
 
+write_csv(xrf_data, "data/clean_data/all_pxrf_chem.csv")
+
 rm(xrf_raw)
 
-
+######################################################################################################
 #------------------------------------------------------------------------------------#
 # chem_xrf_22aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-16-49-44.csv")
 
@@ -115,28 +117,39 @@ rm(xrf_raw)
 #------------------------------------------------------------------------------------#
 
 ##### Join all pXRF chemistry files into "all_chem" #####
-all_chem <- bind_rows(chem_xrf_22aug, chem_xrf_23aug, chem_xrf_26aug, chem_xrf_27aug, chem_xrf_29aug)
+# all_chem <- bind_rows(chem_xrf_22aug, chem_xrf_23aug, chem_xrf_26aug, chem_xrf_27aug, chem_xrf_29aug)
 
-str(all_chem)
+# str(all_chem)
 
 
-all_chem %>%
-  select(Reading_No, Date, PConcentration, P_Error1s) %>% 
-  separate(col = Date, into = c("day", "month", "year"), sep = "/") %>% 
-  mutate(reading_id = str_pad(Reading_No, 3, "left", "0")) %>% 
-  unite(reading_id, year, month, day, reading_id, sep = "-") %>% 
-  select(reading_id, PConcentration, P_Error1s) %>% 
-  write_csv("data/clean_data/all_pxrf_phosphorus.csv")
-   
+# all_chem %>%
+# select(Reading_No, Date, PConcentration, P_Error1s) %>% 
+# separate(col = Date, into = c("day", "month", "year"), sep = "/") %>% 
+# mutate(reading_id = str_pad(Reading_No, 3, "left", "0")) %>% 
+#  unite(reading_id, year, month, day, reading_id, sep = "-") %>% 
+#  select(reading_id, PConcentration, P_Error1s) %>% 
+#  write_csv("data/clean_data/all_pxrf_phosphorus.csv")
+#######################################################################################################   
 
 all_pxrf_id <- read_csv("data/clean_data/all_pxrf_id.csv")
-all_pxrf_phosphorus <- read_csv("data/clean_data/all_pxrf_phosphorus.csv")
+all_pxrf_chem <- read_csv("data/clean_data/all_pxrf_chem.csv")
 
-genotype_phosphorus <- left_join(all_pxrf_id, all_pxrf_phosphorus, by = "reading_id")
+genotype_chem <- left_join(all_pxrf_id, all_pxrf_chem, by = "SCANNING_CODE")
 
-genotype_phosphorus %>% 
-  view() %>% 
-  write_csv("data/clean_data/all_gen_phosphorus.csv")
+genotype_chem %>% 
+  view () %>% 
+  write_csv("data/clean_data/all_gen_pxrf_chem.csv")
 
+all_gen_pxrf_chem <- read_csv("data/clean_data/all_gen_pxrf_chem.csv")
+hi_York_data <- read_csv("data/York_hi/hi_York_data.csv")
+
+str(genotype_chem)
+str(hi_York_data)
+
+gen_chem_york_hi <- left_join(all_gen_pxrf_chem, hi_York_data, by = "STEM_ID")
+
+gen_chem_york_hi %>% 
+  write_csv("data/clean_data/gen_chem_york_hi.csv")
+#-----------------------------------------------------------------------------------------------------#
 
 
