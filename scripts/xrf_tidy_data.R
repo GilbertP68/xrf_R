@@ -1,5 +1,7 @@
+library(data.table)
 library(tidyverse)
 library(readxl)
+library(lubridate)
 
 ##### Reading each file with sample IDs that was created each time when using pXRF #####
 xrf_id_22aug <-read_excel(
@@ -25,22 +27,31 @@ xrf_id_29aug <-read_excel(
 
 ##### Join all sample IDs files into "all_id" #####
 all_id <- bind_rows(xrf_id_22aug, xrf_id_23aug, xrf_id_26aug, xrf_id_27aug, xrf_id_29aug)
-view(all_id)
-str(all_id)
 
+all_id %>%
+  mutate(Trunc = str_to_upper(str_replace(Trunc, "^1", "01"))) %>% 
+  rename(TRUNC_ID = Trunc) %>% 
+  mutate(Date = as_date(Date),
+         `SCANNING_CODE` = paste0(month(Date, label = T, abbr = T),
+                                  " ",
+                                  day(Date),
+                                  "-",
+                                  `Reading_No`)) %>% 
+  select(TRUNC_ID, GENPRINT, SCANNING_CODE, STEM_ID, SUBSAMPLE_ID, SUBSAMPLE, Remarks) %>% 
+  distinct(TRUNC_ID, GENPRINT, SCANNING_CODE, STEM_ID, SUBSAMPLE_ID, SUBSAMPLE, Remarks) %>% 
+  filter(is.na(Remarks), !is.na(GENPRINT)) ->
+  all_id_select
 
-##### Select only where Remarks is equal to "NA" and GENPRINT not equal to "NA" #####
-all_id_select <- all_id %>% 
-  select(Trunc, SUBSAMPLE_ID, STEM_ID, SUBSAMPLE, GENPRINT, Date, Reading_No, Mode, Remarks) %>% 
-  filter(is.na(Remarks), !is.na(GENPRINT)) %>% 
-  view  
+  view(all_id_select)
 
-
-##### Adding a new column "reading_id" with the number format "000" and concatenating with date
-all_id_select %>% mutate(reading_id = str_pad(Reading_No, 3, "left", "0")) %>% 
-  unite(reading_id, Date, reading_id, sep = "-") %>% 
-  select(reading_id, SUBSAMPLE_ID, STEM_ID, GENPRINT, SUBSAMPLE) %>% 
-  write_csv("data/clean_data/all_pxrf_id.csv")
+  write_csv(all_id_select, "data/clean_data/all_pxrf_id.csv")
+  
+  
+##### Another way of creating new column heading: Adding a new column "reading_id" with the number format "000" and concatenating with date
+# all_id_select %>% mutate(SCANNING_CODE = str_pad(Reading_No, 3, "left", "0")) %>% 
+# unite(reading_id, Date, reading_id, sep = "-") %>% 
+#  select(reading_id, SUBSAMPLE_ID, STEM_ID, GENPRINT, SUBSAMPLE) %>% 
+ 
 
 #-----------------------------------------------------------------------------------------------#
 ## temp <- data.table::fread("data/pXRF_Data_original/chemistry-803819-2019-08-22-16-49-44.csv")
@@ -51,17 +62,55 @@ all_id_select %>% mutate(reading_id = str_pad(Reading_No, 3, "left", "0")) %>%
 
 
 ##### Reading each file with pXRF chemistry data #####
-chem_xrf_22aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-16-49-44.csv")
 
-chem_xrf_222aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-12-33-41.csv")
+xrf_files <- list.files(path = "data/pXRF_Data_original/", pattern = "chemistry", full.names = T)
+xrf_files
 
-chem_xrf_23aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-23-12-46-47.csv")
+xrf_list <- lapply(xrf_files, data.table::fread)
 
-chem_xrf_26aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-26-16-11-38.csv")
+names(xrf_list) <- list.files(path = "data/pXRF_Data_original/", pattern = "chemistry")
 
-chem_xrf_27aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-27-16-23-10.csv")
+xrf_raw <- data.table::rbindlist(xrf_list, idcol = T, fill = TRUE)
 
-chem_xrf_29aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-29-14-24-17.csv")
+names(xrf_raw)
+
+# Removing the objects "xrf_files" abd "xrf_list" from the Global Environment
+rm(xrf_files, xrf_list)
+
+
+# Mung
+
+nrow(distinct(xrf_raw, `Reading #`, Date)) #looks like there are duplicate records in different
+# excel files; we can ensure they are true duplicates, rather than label duplications, 
+# by using distinct() on the date frame once the .id is dropped.
+
+xrf_raw%>%
+  mutate(Date = as_date(Date),
+         SCANNING_CODE = paste0(month(Date, label = T, abbr = T),
+                                " ",
+                                day(Date),
+                                "-",
+                                `Reading #`))%>%
+  select(SCANNING_CODE, ends_with("Concentration"), ends_with("Error1s")) %>% # Selecting only the columns containing "Concentration" and "Errors1s"
+  distinct()-> # removes true duplicates
+  xrf_data
+view(xrf_data)
+
+rm(xrf_raw)
+
+
+#------------------------------------------------------------------------------------#
+# chem_xrf_22aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-16-49-44.csv")
+
+# chem_xrf_222aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-22-12-33-41.csv")
+
+# chem_xrf_23aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-23-12-46-47.csv")
+
+# chem_xrf_26aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-26-16-11-38.csv")
+
+# chem_xrf_27aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-27-16-23-10.csv")
+
+# chem_xrf_29aug <- read_csv("data/pXRF_Data/chemistry-803819-2019-08-29-14-24-17.csv")
 
 #------------------------------------------------------------------------------------#
 

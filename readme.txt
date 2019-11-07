@@ -15,5 +15,5 @@ Objectives:
 	
 - 1.1 Working with the pXRF_SampleIDs files
 	- 1.1.1 Check data type/structure in each file
-	- 1.1.2 Join the all files
+	- 1.1.2 Join all files
 
