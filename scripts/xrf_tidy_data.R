@@ -151,5 +151,21 @@ gen_chem_york_hi <- left_join(all_gen_pxrf_chem, hi_York_data, by = "STEM_ID")
 gen_chem_york_hi %>% 
   write_csv("data/clean_data/gen_chem_york_hi.csv")
 #-----------------------------------------------------------------------------------------------------#
+# Graphical representation of data
 
+good_gen_chem_hi <- gen_chem_york_hi %>% # Removing negative values for harvest index
+  filter(harvest_index > 0)
+ 
+hi_Pconc <- ggplot(data = good_gen_chem_hi,
+       mapping = aes(x = `P Concentration`,
+                     y = harvest_index,
+                     colour = SUBSAMPLE
+                     )) +
+  geom_point() +
+  geom_smooth(method = "lm", size = 0.5)
 
+hi_Pconc +
+  labs(title = "Harvest index against phosphorus concentration in shoots and grains",
+       caption = "Data from gen_chem_york_hi",
+       x = "P Concentration (ppm)",
+       y = "Harvest Index")
