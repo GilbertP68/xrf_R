@@ -11,9 +11,10 @@ Data: Grain yield, dry biomass (to be determined from grab sample), total chemic
 Aims: To identify the high performing genotypes in each treatment, then select the ones with the least difference between the two treatments
 
 Objectives:
-1. Tidy-up data: (Sample processing still in progress – only about 400 samples will be analysed)
+1. Tidy-up data: (Sample processing still in progress only about 400 samples will be analysed)
 	
 - 1.1 Working with the pXRF_SampleIDs files
 	- 1.1.1 Check data type/structure in each file
 	- 1.1.2 Join all files
+	- 1.1.3 
 
