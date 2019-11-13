@@ -165,7 +165,7 @@ ggplot(data = gen_chem_york_hi,
   geom_point() +
   geom_smooth(method = "lm", size = 0.5)
 
-# Removing the 2 hi outliers
+#####---------- Removing the 2 hi outliers -----------#####
 good_data <- gen_chem_york_hi %>% # Removing negative values for harvest index
   filter(harvest_index > 0)
 
@@ -177,7 +177,8 @@ good_data %>%
 hi_Pconc <- ggplot(data = good_data,
                    mapping = aes(x = harvest_index,
                                  y = `P Concentration`,
-                                 colour = SUBSAMPLE
+                                 colour = PAP,
+                                 shape = SUBSAMPLE
                                  )) +
   geom_point() +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
@@ -194,7 +195,8 @@ hi_Pconc +
 biomass_Pconc <- ggplot(data = good_data,
                    mapping = aes(x = biomass,
                                  y = `P Concentration`,
-                                 colour = SUBSAMPLE
+                                 colour = PAP,
+                                 shape = SUBSAMPLE
                    )) +
   geom_point() +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
@@ -210,7 +212,8 @@ biomass_Pconc +
 yield_Pconc <- ggplot(data = good_data,
                         mapping = aes(x = yield,
                                       y = `P Concentration`,
-                                      colour = SUBSAMPLE
+                                      colour = PAP,
+                                      shape = SUBSAMPLE
                         )) +
   geom_point() +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
@@ -224,12 +227,12 @@ yield_Pconc +
 #-----------------------------------------------------------------------------------------------------#
 # Create 2 dataframes from good-data: One for with values for straw and the other one for grain
 straw_p <- good_data %>% 
-  select(STEM_ID, SUBSAMPLE, `P Concentration`) %>% 
+  select(STEM_ID, SUBSAMPLE, `P Concentration`, PAP, yield) %>% 
   filter(SUBSAMPLE =="Straw") %>% 
   view()
 
 grain_p <- good_data %>% 
-  select(STEM_ID, SUBSAMPLE, `P Concentration`) %>% 
+  select(STEM_ID, SUBSAMPLE, `P Concentration`, PAP, yield) %>% 
   filter(SUBSAMPLE =="Grain") %>% 
   view()
 
@@ -242,8 +245,11 @@ straw_grain_p <- left_join(straw_p, grain_p, by = "STEM_ID") %>%
 # Graph 5: P in shoots vs P in grains
 straw_grain <- ggplot(data = straw_grain_p,
                       mapping = aes(x = grain_pconc,
-                                    y = straw_pconc)) +
-  geom_point() +
+                                    y = straw_pconc,
+                                    colour = PAP.x,
+                                    size = yield.x
+                                    )) +
+  geom_point(alpha = 0.2) +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
 straw_grain +
@@ -251,5 +257,9 @@ straw_grain +
        caption = "Data from straw_grain_p",
        x = "Grains",
        y = "Straw") +
-  geom_point()
+  geom_point(alpha = 0.2)
+
+#-----------------------------------------------------------------------------------------------------#
+good_data %>% 
+  
 
