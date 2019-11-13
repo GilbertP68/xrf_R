@@ -163,11 +163,11 @@ data_check <- ggplot(data = gen_chem_york_hi,
                      colour = SUBSAMPLE
                      )) +
   geom_point() +
-  geom_smooth(method = "lm", size = 0.5)
+  geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
 ggsave("results/graph1_data_check.jpg", 
        plot = data_check,
-       width = 12,
+       width = 20,
        height = 10,
        units = "cm")
 
@@ -179,7 +179,7 @@ good_data <- gen_chem_york_hi %>% # Removing negative values for harvest index
 good_data %>% 
   write_csv("data/clean_data/good_data_york_pxrf.csv")  
 
-# Graph 2: P concentration index in shoots and grains vs harvest 
+# Graph 2: P concentration in shoots and grains vs harvest 
 hi_Pconc <- ggplot(data = good_data,
                    mapping = aes(x = harvest_index,
                                  y = `P Concentration`,
@@ -189,13 +189,18 @@ hi_Pconc <- ggplot(data = good_data,
   geom_point() +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
-hi_Pconc +
-  labs(title = "Phosphorus concentration in shoots and grains against harvest index",
+graph2_hi_Pconc <- hi_Pconc +
+  labs(title = "Phosphorus concentration in straw and grains vs harvest index",
        caption = "Data from good_data_york_pxrf.csv",
        x = "Harvest Index",
        y = "P Concentration (ppm)") +
   geom_point()
 
+ggsave("results/graph2_hi_Pconc.jpg", 
+       plot = graph2_hi_Pconc,
+       width = 20,
+       height = 10,
+       units = "cm")
 
 # Graph 3: P concentration in shoots and grains vs biomass
 biomass_Pconc <- ggplot(data = good_data,
@@ -207,12 +212,18 @@ biomass_Pconc <- ggplot(data = good_data,
   geom_point() +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
-biomass_Pconc +
-  labs(title = "Phosphorus concentration in shoots and grains vs biomass",
+graph3_biomass_Pconc <- biomass_Pconc +
+  labs(title = "Phosphorus concentration in straw and grains vs biomass",
        caption = "Data from good_data_york_pxrf.csv",
        x = "Biomass (Kg)",
        y = "P Concentration (ppm)") +
   geom_point()
+
+ggsave("results/graph3_biomass_Pconc.jpg", 
+       plot = graph3_biomass_Pconc,
+       width = 20,
+       height = 10,
+       units = "cm")
 
 # Graph 4: P concentration in shoots and grains vs grain yield
 yield_Pconc <- ggplot(data = good_data,
@@ -224,12 +235,19 @@ yield_Pconc <- ggplot(data = good_data,
   geom_point() +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
-yield_Pconc +
-  labs(title = "Yield against phosphorus concentration in shoots and grains",
+graph4_yield_Pconc <- yield_Pconc +
+  labs(title = "Phosphorus concentration in straw and grains vs grain yield",
        caption = "Data from good_data_york_pxrf.csv",
        x = "Yield (Kg)",
        y = "P Concentration (ppm)") +
   geom_point()
+
+ggsave("results/graph4_yield_Pconc.jpg", 
+       plot = graph4_yield_Pconc,
+       width = 20,
+       height = 10,
+       units = "cm")
+
 #-----------------------------------------------------------------------------------------------------#
 # Create 2 dataframes from good-data: One for with values for straw and the other one for grain
 straw_p <- good_data %>% 
@@ -249,21 +267,28 @@ straw_grain_p <- left_join(straw_p, grain_p, by = "STEM_ID") %>%
   write_csv("data/clean_data/straw_grain_p.csv")
 
 # Graph 5: P in shoots vs P in grains
+straw_grain_p <- read_csv("data/clean_data/straw_grain_p.csv")
+
 straw_grain <- ggplot(data = straw_grain_p,
                       mapping = aes(x = grain_pconc,
                                     y = straw_pconc,
-                                    colour = PAP.x,
-                                    size = yield.x
+                                    colour = PAP.x
                                     )) +
   geom_point(alpha = 0.2) +
   geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
-straw_grain +
-  labs(title = "Amount of P in shoots vs amount of P in grains",
+graph5_P_straw_grain <- straw_grain +
+  labs(title = "Amount of P in straw vs amount of P in grains",
        caption = "Data from straw_grain_p",
        x = "Grains",
        y = "Straw") +
   geom_point(alpha = 0.2)
+
+ggsave("results/graph5_P_straw_grain.jpg", 
+       plot = graph5_P_straw_grain,
+       width = 20,
+       height = 10,
+       units = "cm")
 
 #-----------------------------------------------------------------------------------------------------#
   
