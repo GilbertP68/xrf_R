@@ -157,13 +157,19 @@ gen_chem_york_hi <- read_csv("data/clean_data/gen_chem_york_hi.csv")
 view(gen_chem_york_hi)
 
 # Graph 1: First data visualisation shows 2 outliers of harvest index (hi), which needs to be removed
-ggplot(data = gen_chem_york_hi,
+data_check <- ggplot(data = gen_chem_york_hi,
        mapping = aes(x = `P Concentration`,
                      y = harvest_index,
                      colour = SUBSAMPLE
                      )) +
   geom_point() +
   geom_smooth(method = "lm", size = 0.5)
+
+ggsave("results/graph1_data_check.jpg", 
+       plot = data_check,
+       width = 12,
+       height = 10,
+       units = "cm")
 
 #####---------- Removing the 2 hi outliers -----------#####
 good_data <- gen_chem_york_hi %>% # Removing negative values for harvest index
@@ -260,6 +266,5 @@ straw_grain +
   geom_point(alpha = 0.2)
 
 #-----------------------------------------------------------------------------------------------------#
-good_data %>% 
   
 
