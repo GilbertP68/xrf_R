@@ -180,7 +180,7 @@ hi_Pconc <- ggplot(data = good_data,
                                  colour = SUBSAMPLE
                                  )) +
   geom_point() +
-  geom_smooth(method = "lm", size = 0.5)
+  geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
 hi_Pconc +
   labs(title = "Phosphorus concentration in shoots and grains against harvest index",
@@ -197,7 +197,7 @@ biomass_Pconc <- ggplot(data = good_data,
                                  colour = SUBSAMPLE
                    )) +
   geom_point() +
-  geom_smooth(method = "lm", size = 0.5)
+  geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
 biomass_Pconc +
   labs(title = "Phosphorus concentration in shoots and grains vs biomass",
@@ -213,7 +213,7 @@ yield_Pconc <- ggplot(data = good_data,
                                       colour = SUBSAMPLE
                         )) +
   geom_point() +
-  geom_smooth(method = "lm", size = 0.5)
+  geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
 yield_Pconc +
   labs(title = "Yield against phosphorus concentration in shoots and grains",
@@ -221,20 +221,35 @@ yield_Pconc +
        x = "Yield (Kg)",
        y = "P Concentration (ppm)") +
   geom_point()
+#-----------------------------------------------------------------------------------------------------#
+# Create 2 dataframes from good-data: One for with values for straw and the other one for grain
+straw_p <- good_data %>% 
+  select(STEM_ID, SUBSAMPLE, `P Concentration`) %>% 
+  filter(SUBSAMPLE =="Straw") %>% 
+  view()
 
-# Graph 5: P concentration in shoots and grains vs grain yield
-yield_Pconc <- ggplot(data = good_data,
-                      mapping = aes(x = yield,
-                                    y = `P Concentration`,
-                                    colour = SUBSAMPLE
-                      )) +
+grain_p <- good_data %>% 
+  select(STEM_ID, SUBSAMPLE, `P Concentration`) %>% 
+  filter(SUBSAMPLE =="Grain") %>% 
+  view()
+
+straw_grain_p <- left_join(straw_p, grain_p, by = "STEM_ID") %>%
+  rename(straw_pconc = `P Concentration.x`, 
+         grain_pconc = `P Concentration.y`) %>% 
+  view() %>% 
+  write_csv("data/clean_data/straw_grain_p.csv")
+
+# Graph 5: P in shoots vs P in grains
+straw_grain <- ggplot(data = straw_grain_p,
+                      mapping = aes(x = grain_pconc,
+                                    y = straw_pconc)) +
   geom_point() +
-  geom_smooth(method = "lm", size = 0.5)
+  geom_smooth(method = "lm", size = 0.5, se = FALSE)
 
-yield_Pconc +
-  labs(title = "Yield against phosphorus concentration in shoots and grains",
-       caption = "Data from good_data_york_pxrf.csv",
-       x = "Yield (Kg)",
-       y = "P Concentration (ppm)") +
+straw_grain +
+  labs(title = "Amount of P in shoots vs amount of P in grains",
+       caption = "Data from straw_grain_p",
+       x = "Grains",
+       y = "Straw") +
   geom_point()
 
