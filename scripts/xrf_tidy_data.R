@@ -151,6 +151,7 @@ gen_chem_york_hi <- left_join(all_gen_pxrf_chem, hi_York_data, by = "STEM_ID")
 gen_chem_york_hi %>% 
   write_csv("data/clean_data/gen_chem_york_hi.csv")
 #-----------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------#
 # Reading data file for first graphical visualisation
 gen_chem_york_hi <- read_csv("data/clean_data/gen_chem_york_hi.csv")
 view(gen_chem_york_hi)
@@ -172,7 +173,7 @@ good_data <- gen_chem_york_hi %>% # Removing negative values for harvest index
 good_data %>% 
   write_csv("data/clean_data/good_data_york_pxrf.csv")  
 
-# Graph 2: P concentration vs harvest index
+# Graph 2: P concentration index in shoots and grains vs harvest 
 hi_Pconc <- ggplot(data = good_data,
                    mapping = aes(x = harvest_index,
                                  y = `P Concentration`,
@@ -182,11 +183,58 @@ hi_Pconc <- ggplot(data = good_data,
   geom_smooth(method = "lm", size = 0.5)
 
 hi_Pconc +
-  labs(title = "Harvest index against phosphorus concentration in shoots and grains",
-       caption = "Data from gen_chem_york_hi",
+  labs(title = "Phosphorus concentration in shoots and grains against harvest index",
+       caption = "Data from good_data_york_pxrf.csv",
        x = "Harvest Index",
        y = "P Concentration (ppm)") +
   geom_point()
 
 
+# Graph 3: P concentration in shoots and grains vs biomass
+biomass_Pconc <- ggplot(data = good_data,
+                   mapping = aes(x = biomass,
+                                 y = `P Concentration`,
+                                 colour = SUBSAMPLE
+                   )) +
+  geom_point() +
+  geom_smooth(method = "lm", size = 0.5)
+
+biomass_Pconc +
+  labs(title = "Phosphorus concentration in shoots and grains vs biomass",
+       caption = "Data from good_data_york_pxrf.csv",
+       x = "Biomass (Kg)",
+       y = "P Concentration (ppm)") +
+  geom_point()
+
+# Graph 4: P concentration in shoots and grains vs grain yield
+yield_Pconc <- ggplot(data = good_data,
+                        mapping = aes(x = yield,
+                                      y = `P Concentration`,
+                                      colour = SUBSAMPLE
+                        )) +
+  geom_point() +
+  geom_smooth(method = "lm", size = 0.5)
+
+yield_Pconc +
+  labs(title = "Yield against phosphorus concentration in shoots and grains",
+       caption = "Data from good_data_york_pxrf.csv",
+       x = "Yield (Kg)",
+       y = "P Concentration (ppm)") +
+  geom_point()
+
+# Graph 5: P concentration in shoots and grains vs grain yield
+yield_Pconc <- ggplot(data = good_data,
+                      mapping = aes(x = yield,
+                                    y = `P Concentration`,
+                                    colour = SUBSAMPLE
+                      )) +
+  geom_point() +
+  geom_smooth(method = "lm", size = 0.5)
+
+yield_Pconc +
+  labs(title = "Yield against phosphorus concentration in shoots and grains",
+       caption = "Data from good_data_york_pxrf.csv",
+       x = "Yield (Kg)",
+       y = "P Concentration (ppm)") +
+  geom_point()
 
