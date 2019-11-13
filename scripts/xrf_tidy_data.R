@@ -151,12 +151,12 @@ gen_chem_york_hi <- left_join(all_gen_pxrf_chem, hi_York_data, by = "STEM_ID")
 gen_chem_york_hi %>% 
   write_csv("data/clean_data/gen_chem_york_hi.csv")
 #-----------------------------------------------------------------------------------------------------#
-# Graphical representation of data
+# Reading data file for first graphical visualisation
+gen_chem_york_hi <- read_csv("data/clean_data/gen_chem_york_hi.csv")
+view(gen_chem_york_hi)
 
-good_gen_chem_hi <- gen_chem_york_hi %>% # Removing negative values for harvest index
-  filter(harvest_index > 0)
- 
-hi_Pconc <- ggplot(data = good_gen_chem_hi,
+# Graph 1: First data visualisation shows 2 outliers of harvest index (hi), which needs to be removed
+ggplot(data = gen_chem_york_hi,
        mapping = aes(x = `P Concentration`,
                      y = harvest_index,
                      colour = SUBSAMPLE
@@ -164,8 +164,29 @@ hi_Pconc <- ggplot(data = good_gen_chem_hi,
   geom_point() +
   geom_smooth(method = "lm", size = 0.5)
 
+# Removing the 2 hi outliers
+good_data <- gen_chem_york_hi %>% # Removing negative values for harvest index
+  filter(harvest_index > 0)
+
+# Good data in "good_data_york_pxrf.csv
+good_data %>% 
+  write_csv("data/clean_data/good_data_york_pxrf.csv")  
+
+# Graph 2: P concentration vs harvest index
+hi_Pconc <- ggplot(data = good_data,
+                   mapping = aes(x = harvest_index,
+                                 y = `P Concentration`,
+                                 colour = SUBSAMPLE
+                                 )) +
+  geom_point() +
+  geom_smooth(method = "lm", size = 0.5)
+
 hi_Pconc +
   labs(title = "Harvest index against phosphorus concentration in shoots and grains",
        caption = "Data from gen_chem_york_hi",
-       x = "P Concentration (ppm)",
-       y = "Harvest Index")
+       x = "Harvest Index",
+       y = "P Concentration (ppm)") +
+  geom_point()
+
+
+
