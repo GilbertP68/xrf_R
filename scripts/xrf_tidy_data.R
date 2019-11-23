@@ -251,12 +251,12 @@ ggsave("results/graph4_yield_Pconc.jpg",
 #-----------------------------------------------------------------------------------------------------#
 # Create 2 dataframes from good-data: One for with values for straw and the other one for grain
 straw_p <- good_data %>% 
-  select(STEM_ID, SUBSAMPLE, `P Concentration`, PAP, yield) %>% 
+  select(STEM_ID, GENOTYPE, SUBSAMPLE, `P Concentration`, PAP, yield) %>% 
   filter(SUBSAMPLE =="Straw") %>% 
   view()
 
 grain_p <- good_data %>% 
-  select(STEM_ID, SUBSAMPLE, `P Concentration`, PAP, yield) %>% 
+  select(STEM_ID, SUBSAMPLE, `P Concentration`, PAP) %>% 
   filter(SUBSAMPLE =="Grain") %>% 
   view()
 
